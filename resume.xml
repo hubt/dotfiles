@@ -1,0 +1,183 @@
+<?xml version="1.0"?>
+<resume>
+  <url>http://www.chen.net/~hubt/resume.html</url>
+  <name>Hubert Chen</name>
+  <title>Hubert Chen's Resume</title>
+  <mapurl>http://maps.yahoo.com/py/maps.py?Pyt=Tmap&amp;addr=6670+Ivy+Lane&amp;csz=San+Jose,CA+&amp;Get+Map=Get+Map</mapurl>
+
+  <address1>6670 Ivy Lane</address1>
+  <address2>San Jose, CA 95129</address2>
+  <phone>650.270.3008</phone>
+  <email>hubert@chen.net</email>
+  <objective>A job in software development with increasing management
+responsibility utilizing a variety of technology skills including Java
+or C/C++, multi-tiered architecture, networking, and systems design and
+broadening into team building, project management, and business decision
+making.
+</objective>
+   <skills>
+     <category name="Languages">
+       <item>Java</item>
+       <item>Perl</item>
+       <item>C/C++</item>
+       <item>JSP</item>
+     </category>
+     <category name="Operating Systems">
+       <item>Linux</item>
+       <item>Windows</item>
+       <item>Solaris</item>
+     </category>
+     <category name="Databases">
+       <item>MySQL</item>
+       <item>JDBC</item>
+       <item>Oracle</item>
+       <item>MSSQL</item>
+     </category>
+     <category name="Networking">
+       <item>TCP/IP</item>
+       <item>HTTP</item>
+       <item>SMTP</item>
+     </category>
+     <category name="Computing">
+       <item>Operating Systems</item>
+       <item>Data Security</item>
+       <item>OOP</item>
+     </category>
+   </skills>
+   <experience>
+     <title>Senior Systems Engineer</title>
+     <company><name>Shutterfly</name></company>
+     <url>http://www.shutterfly.com</url>
+     <date>Nov. 05-current</date>
+     <description>
+     Worked on internal monitoring systems. Provided systems capacity planning and performance evaluation for hundreds of systems. Worked on wiki based system metrics reporting platform using MySQL, Confluence, and Perl. Provided JIRA and Confluence support for hundreds of users, some custom JIRA and Confluence development work.
+      </description>
+   </experience>
+   <experience>
+     <title>Software Engineer</title>
+     <company><name>Become.com</name></company>
+     <url>http://www.become.com</url>
+     <date>May 04-Nov. 05</date>
+     <description>
+
+Developed major portions of internet search engine.  Developed large scale
+distributed crawling system using both Java and C++. Integrated different
+components in application server and developed part of presentation
+layer. Helped monitor and maintain uptime for 24x7 operation. Performed
+many system administration tasks. Helped to institute source control
+and software development process. Rapidly learned information retrieval 
+techniques and some machine learning. Implemented search engine keyword 
+buying system.
+
+      </description>
+   </experience>
+   <experience>
+     <title>Senior Software Engineer</title>
+     <company>
+        <name>
+        Avasta
+        </name>
+        <description>
+          (now owned by <a href="http://www.navisite.com">Navisite</a>) 
+        </description>
+     </company>
+     <url>http://www.avasta.net</url>
+     <date>Sep. 02-Feb. 03</date>
+     <description>
+Developed and maintained Java based workflow engine. Ensured system
+scalability and redundancy by designing distributed processing and
+making code improvements through performance profiling. Integrated email
+capabilities into 3-tiered web based systems management server
+which provided 24x7 monitoring and notification.
+     </description>
+   </experience>
+   <experience>
+     <title>Software Engineer</title>
+     <company><name>Blue Martini Software</name></company>
+     <url>http://www.bluemartini.com</url>
+     <date>Aug. 00-Jul. 02</date>
+     <description>
+      Developed core scalable, multi-tiered application server
+infrastructure in Java. Extensive programming on NT and Solaris with use
+of JSPs and JDBC connecting to Oracle and MSSQL server. eCRM
+Applications built on WebLogic application server also integrated with a
+variety of other systems including search engines, payment
+systems, data mining, other enterprise systems. 
+     </description>
+   </experience>
+   <experience>
+     <title>Senior Software Engineer</title>
+     <company><name>Cybersource</name></company>
+     <url>http://www.cybersource.com</url>
+     <date>Sep. 97-Jun. 00</date>
+     <description>
+          Developed cryptographic and messaging protocols for
+electronic commerce. Worked heavily in CGI, Perl, Java and C.
+Designed and implemented networking code for Sm@rtcert product.
+Extensive UNIX, web, and network programming.
+     </description>
+   </experience>
+   <experience>
+     <title>Consultant</title>
+     <company>
+       <name>Bluestone</name>
+       <description>(now owned by <a href="http://www.hp.com">HP</a>)
+       </description>
+     </company>
+     <url>http://www.hp.com</url>
+     <date>Oct. 96-Feb. 97</date>
+     <description>
+ Developed Java applications and         applets, for customers.
+Provided consulting for Internet         applications. Recommended
+solutions for web applications.         Worked on a large system which
+manages billing, scheduling, and ordering of commercials for cable,
+network TV, and radio. The three-tiered         application was
+developed using the Dynasty Development         Environment, C, and
+Oracle on Windows NT and UNIX.         Techniques employed include
+object oriented design, use         case methodology.
+     </description>
+   </experience>
+   <experience>
+     <title>Programmer</title>
+     <company><name>Big Hit Internet Communications</name></company>
+     <url>http://www.bighit.com</url>
+     <date>Feb. 96-Sep. 96</date>
+     <description>
+          Managed         Web sites on Macintosh and Unix. Developed
+custom Web         applications for clients. Wrote CGI's and
+adminstrative scripts to manage Web servers. Integrated databases with
+the Web. Worked with clients to plan and implement Web         sites.
+Organized and managed team to implement and         maintain web sites.
+Gained familiarity with important Internet tools, including Java,
+Netscape Servers, and         Perl.
+     </description>
+   </experience>
+   <experience>
+     <title>Systems Officer</title>
+     <company><name>Citicorp</name></company>
+     <url>http://www.citicorp.com</url>
+     <date>Aug. 94-Feb. 96</date>
+     <description>
+          Developed strategic technology plan for senior
+management. Plan included technology directions, systems
+development standards, and initiatives for process improvement.
+Performed evaluations of new technology including Dynasty, Lotus
+Notes, Windows NT, and Internet related technology. Designed a
+large client/server financial application using C++ with
+Windows, HP-UX, and an Oracle database. Developed prototype
+business application using Dynasty to create a three-tiered
+application using Microsoft Windows, HP-UX, and Sybase.
+     </description>
+   </experience>
+   <education>
+     <school>
+       <type>University</type>
+       <name>University of Michigan</name>
+       <url>http://www.umich.edu</url>
+       <location>Ann Arbor, MI</location>
+       <major>Computer Science</major>
+       <degree>B.S.</degree>
+       <graduation>May 1994</graduation>
+     </school>
+   </education>
+</resume>
