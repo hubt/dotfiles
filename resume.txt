@@ -5,26 +5,29 @@
 
      ----------------------------------------------------------------------
 
-     Objective:  A job in software development with increasing management     
-                 responsibility utilizing a variety of technology skills      
-                 including Java or C/C++, multi-tiered architecture,          
-                 networking, and systems design and broadening into team      
-                 building, project management, and business decision making.  
-     Skills:     Languages Operating      Databases Networking Computing      
-                           Systems                                            
-                 Java      Linux          MySQL     TCP/IP     Operating      
-                 Perl      Windows        JDBC      HTTP       Systems        
-                 C/C++     Solaris        Oracle    SMTP       Data Security  
-                 JSP                      MSSQL                OOP            
-     Experience:   * Senior Systems Engineer: Shutterfly   Nov. 05-current    
+     Objective:  A job in systems management and architecture designing       
+                 scalable systems which meet current and future business      
+                 needs.                                                       
+     Skills:     Languages Data Storage Skills              Interests         
+                 Perl      MySQL        Scalability         Cloud Computing   
+                 Java      Oracle       Availability        DevOps            
+                 Python    Big Data     Systems Management  Algorithms        
+                 C/C++     Storage      Systems Performance Linux             
+     Experience:   * Manager Web Engineering: Shutterfly   Nov. 05-current    
                                                                               
-                     Worked on internal monitoring systems. Provided systems  
-                     capacity planning and performance evaluation for         
-                     hundreds of systems. Worked on wiki based system         
-                     metrics reporting platform using MySQL, Confluence, and  
-                     Perl. Provided JIRA and Confluence support for hundreds  
-                     of users, some custom JIRA and Confluence development    
-                     work.                                                    
+                     Broad range of responsibilities within Internet          
+                     Operations and DevOps divisions. Planning,               
+                     architecture, and system design. Day-to-day uptime and   
+                     operational lead for e-commerce site with $500m/yr in    
+                     sales. Lead migration of 7 PB of image data for Kodak    
+                     purchase. Ad hoc data analysis. Provide operational      
+                     design and architecture reviews for Engineering          
+                     features. Performance testing and capacity planning.     
+                     Lead CDN implementation. Worked on internal nagios and   
+                     cacti monitoring systems. Provided systems capacity      
+                     planning and performance evaluation for hundreds of      
+                     systems. Provided JIRA and Confluence administration     
+                     and support for hundreds of users.                       
                                                                               
                    * Software Engineer: Become.com   May 04-Nov. 05           
                                                                               
@@ -33,32 +36,25 @@
                      both Java and C++. Integrated different components in    
                      application server and developed part of presentation    
                      layer. Helped monitor and maintain uptime for 24x7       
-                     operation. Performed many system administration tasks.   
+                     operation. Performed system administration tasks.        
                      Helped to institute source control and software          
                      development process. Rapidly learned information         
-                     retrieval techniques and some machine learning.          
-                     Implemented search engine keyword buying system.         
+                     retrieval techniques.                                    
                                                                               
-                   * Senior Software Engineer: Avasta (now owned by           
-                     Navisite)   Sep. 02-Feb. 03                              
+                   * Senior Software Engineer: Avasta (bought by Navisite)    
+                     Sep. 02-Feb. 03                                          
                                                                               
                      Developed and maintained Java based workflow engine.     
-                     Ensured system scalability and redundancy by designing   
-                     distributed processing and making code improvements      
-                     through performance profiling. Integrated email          
-                     capabilities into 3-tiered web based systems management  
-                     server which provided 24x7 monitoring and notification.  
                                                                               
                    * Software Engineer: Blue Martini Software   Aug. 00-Jul.  
                      02                                                       
                                                                               
                      Developed core scalable, multi-tiered application        
-                     server infrastructure in Java. Extensive programming on  
-                     NT and Solaris with use of JSPs and JDBC connecting to   
-                     Oracle and MSSQL server. eCRM Applications built on      
-                     WebLogic application server also integrated with a       
-                     variety of other systems including search engines,       
-                     payment systems, data mining, other enterprise systems.  
+                     server infrastructure in Java. eCRM Applications built   
+                     on WebLogic application server also integrated with      
+                     Oracle and a variety of other systems including search   
+                     engines, payment systems, data mining, other enterprise  
+                     systems.                                                 
                                                                               
                    * Senior Software Engineer: Cybersource   Sep. 97-Jun. 00  
                                                                               
@@ -68,8 +64,7 @@
                      Sm@rtcert product. Extensive UNIX, web, and network      
                      programming.                                             
                                                                               
-                   * Consultant: Bluestone(now owned by HP)   Oct. 96-Feb.    
-                     97                                                       
+                   * Consultant: Bluestone(bought by HP)   Oct. 96-Feb. 97    
                                                                               
                      Developed Java applications and applets, for customers.  
                      Provided consulting for Internet applications.           
@@ -78,8 +73,7 @@
                      ordering of commercials for cable, network TV, and       
                      radio. The three-tiered application was developed using  
                      the Dynasty Development Environment, C, and Oracle on    
-                     Windows NT and UNIX. Techniques employed include object  
-                     oriented design, use case methodology.                   
+                     Windows NT and UNIX.                                     
                                                                               
                    * Programmer: Big Hit Internet Communications   Feb.       
                      96-Sep. 96                                               
@@ -88,10 +82,8 @@
                      custom Web applications for clients. Wrote CGI's and     
                      adminstrative scripts to manage Web servers. Integrated  
                      databases with the Web. Worked with clients to plan and  
-                     implement Web sites. Organized and managed team to       
-                     implement and maintain web sites. Gained familiarity     
-                     with important Internet tools, including Java, Netscape  
-                     Servers, and Perl.                                       
+                     implement Web sites. Organized team to implement and     
+                     maintain web sites.                                      
                                                                               
                    * Systems Officer: Citicorp   Aug. 94-Feb. 96              
                                                                               
@@ -99,12 +91,8 @@
                      management. Plan included technology directions,         
                      systems development standards, and initiatives for       
                      process improvement. Performed evaluations of new        
-                     technology including Dynasty, Lotus Notes, Windows NT,   
-                     and Internet related technology. Designed a large        
-                     client/server financial application using C++ with       
-                     Windows, HP-UX, and an Oracle database. Developed        
-                     prototype business application using Dynasty to create   
-                     a three-tiered application using Microsoft Windows,      
-                     HP-UX, and Sybase.                                       
+                     technology. Developed prototype business application     
+                     using Dynasty to create a three-tiered application       
+                     using Microsoft Windows, HP-UX, and Sybase.              
      Education:    * University: University of Michigan  Ann Arbor, MI        
                      Concentration: B.S. in Computer Science, May 1994        

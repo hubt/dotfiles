@@ -9,48 +9,41 @@
   <address2>San Jose, CA 95129</address2>
   <phone>650.270.3008</phone>
   <email>hubert@chen.net</email>
-  <objective>A job in software development with increasing management
-responsibility utilizing a variety of technology skills including Java
-or C/C++, multi-tiered architecture, networking, and systems design and
-broadening into team building, project management, and business decision
-making.
+  <objective>A job in systems management and architecture designing scalable systems which meet current and future business needs. 
 </objective>
    <skills>
      <category name="Languages">
-       <item>Java</item>
        <item>Perl</item>
+       <item>Java</item>
+       <item>Python</item>
        <item>C/C++</item>
-       <item>JSP</item>
      </category>
-     <category name="Operating Systems">
-       <item>Linux</item>
-       <item>Windows</item>
-       <item>Solaris</item>
-     </category>
-     <category name="Databases">
+     <category name="Data Storage">
        <item>MySQL</item>
-       <item>JDBC</item>
        <item>Oracle</item>
-       <item>MSSQL</item>
+       <item>Big Data</item>
+       <item>Storage</item>
      </category>
-     <category name="Networking">
-       <item>TCP/IP</item>
-       <item>HTTP</item>
-       <item>SMTP</item>
+     <category name="Skills">
+       <item>Scalability</item>
+       <item>Availability</item>
+       <item>Systems Management</item>
+       <item>Systems Performance</item>
      </category>
-     <category name="Computing">
-       <item>Operating Systems</item>
-       <item>Data Security</item>
-       <item>OOP</item>
+     <category name="Interests">
+       <item>Cloud Computing</item>
+       <item>DevOps</item>
+       <item>Algorithms</item>
+       <item>Linux</item>
      </category>
    </skills>
    <experience>
-     <title>Senior Systems Engineer</title>
+     <title>Manager Web Engineering</title>
      <company><name>Shutterfly</name></company>
      <url>http://www.shutterfly.com</url>
      <date>Nov. 05-current</date>
      <description>
-     Worked on internal monitoring systems. Provided systems capacity planning and performance evaluation for hundreds of systems. Worked on wiki based system metrics reporting platform using MySQL, Confluence, and Perl. Provided JIRA and Confluence support for hundreds of users, some custom JIRA and Confluence development work.
+     Broad range of responsibilities within Internet Operations and DevOps divisions. Planning, architecture, and system design. Day-to-day uptime and operational lead for e-commerce site with $500m/yr in sales. Lead migration of 7 PB of image data for Kodak purchase. Ad hoc data analysis. Provide operational design and architecture reviews for Engineering features. Performance testing and capacity planning. Lead CDN implementation. Worked on internal nagios and cacti monitoring systems. Provided systems capacity planning and performance evaluation for hundreds of systems. Provided JIRA and Confluence administration and support for hundreds of users.
       </description>
    </experience>
    <experience>
@@ -64,10 +57,9 @@ Developed major portions of internet search engine.  Developed large scale
 distributed crawling system using both Java and C++. Integrated different
 components in application server and developed part of presentation
 layer. Helped monitor and maintain uptime for 24x7 operation. Performed
-many system administration tasks. Helped to institute source control
+system administration tasks. Helped to institute source control
 and software development process. Rapidly learned information retrieval 
-techniques and some machine learning. Implemented search engine keyword 
-buying system.
+techniques. 
 
       </description>
    </experience>
@@ -78,17 +70,13 @@ buying system.
         Avasta
         </name>
         <description>
-          (now owned by <a href="http://www.navisite.com">Navisite</a>) 
+          (bought by <a href="http://www.navisite.com">Navisite</a>) 
         </description>
      </company>
      <url>http://www.avasta.net</url>
      <date>Sep. 02-Feb. 03</date>
      <description>
-Developed and maintained Java based workflow engine. Ensured system
-scalability and redundancy by designing distributed processing and
-making code improvements through performance profiling. Integrated email
-capabilities into 3-tiered web based systems management server
-which provided 24x7 monitoring and notification.
+Developed and maintained Java based workflow engine. 
      </description>
    </experience>
    <experience>
@@ -98,9 +86,8 @@ which provided 24x7 monitoring and notification.
      <date>Aug. 00-Jul. 02</date>
      <description>
       Developed core scalable, multi-tiered application server
-infrastructure in Java. Extensive programming on NT and Solaris with use
-of JSPs and JDBC connecting to Oracle and MSSQL server. eCRM
-Applications built on WebLogic application server also integrated with a
+infrastructure in Java.  eCRM
+Applications built on WebLogic application server also integrated with Oracle and a
 variety of other systems including search engines, payment
 systems, data mining, other enterprise systems. 
      </description>
@@ -121,20 +108,19 @@ Extensive UNIX, web, and network programming.
      <title>Consultant</title>
      <company>
        <name>Bluestone</name>
-       <description>(now owned by <a href="http://www.hp.com">HP</a>)
+       <description>(bought by <a href="http://www.hp.com">HP</a>)
        </description>
      </company>
      <url>http://www.hp.com</url>
      <date>Oct. 96-Feb. 97</date>
      <description>
- Developed Java applications and         applets, for customers.
-Provided consulting for Internet         applications. Recommended
-solutions for web applications.         Worked on a large system which
+ Developed Java applications and applets, for customers.
+Provided consulting for Internet applications. Recommended
+solutions for web applications. Worked on a large system which
 manages billing, scheduling, and ordering of commercials for cable,
-network TV, and radio. The three-tiered         application was
-developed using the Dynasty Development         Environment, C, and
-Oracle on Windows NT and UNIX.         Techniques employed include
-object oriented design, use         case methodology.
+network TV, and radio. The three-tiered application was
+developed using the Dynasty Development Environment, C, and
+Oracle on Windows NT and UNIX.
      </description>
    </experience>
    <experience>
@@ -147,9 +133,7 @@ object oriented design, use         case methodology.
 custom Web         applications for clients. Wrote CGI's and
 adminstrative scripts to manage Web servers. Integrated databases with
 the Web. Worked with clients to plan and implement Web         sites.
-Organized and managed team to implement and         maintain web sites.
-Gained familiarity with important Internet tools, including Java,
-Netscape Servers, and         Perl.
+Organized team to implement and         maintain web sites.
      </description>
    </experience>
    <experience>
@@ -161,10 +145,7 @@ Netscape Servers, and         Perl.
           Developed strategic technology plan for senior
 management. Plan included technology directions, systems
 development standards, and initiatives for process improvement.
-Performed evaluations of new technology including Dynasty, Lotus
-Notes, Windows NT, and Internet related technology. Designed a
-large client/server financial application using C++ with
-Windows, HP-UX, and an Oracle database. Developed prototype
+Performed evaluations of new technology. Developed prototype
 business application using Dynasty to create a three-tiered
 application using Microsoft Windows, HP-UX, and Sybase.
      </description>
