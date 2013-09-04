@@ -1,0 +1,3 @@
+#!/bin/sh
+
+curl -v -s -S -o /dev/null -L -w  "URL: %{url_effective}\n%{http_code}\nContent-Type: %{content_type}\nIP: %{remote_ip}:%{remote_port}\nsize: %{size_download}\nHeader-Length: %{size_header}\nSpeed: %{speed_download} b/s\nLookup time: %{time_namelookup}\nConnect: %{time_connect}\nTime pretransfer: %{time_pretransfer}\nTime starttransfer: %{time_starttransfer}\nTotal Time: %{time_total}\n" -H "Pragma: no-cache" $*
