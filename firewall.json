@@ -1,0 +1,16 @@
+{
+   "hosts" : {
+      "client01" : [
+         "LOCAL-HTTP",
+         "GOOGLE-HTTP"
+      ],
+      "localhost" : [
+         "LOCAL-HTTP",
+         "GOOGLE-HTTP"
+      ]
+   },
+   "services" : {
+      "LOCAL-HTTP" : "127.0.0.1:80",
+      "GOOGLE-HTTP" : "www.google.com:80"
+   }
+}
