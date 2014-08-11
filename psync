@@ -1,0 +1,4 @@
+#!/bin/bash
+
+find . -print0 | xargs --null -P 4 -n 100 perl -e 'open(R,"|rsync --from0 -a --files-from=- . /tmp/sdf2");for(@ARGV){print R "$_\0"}'
+
