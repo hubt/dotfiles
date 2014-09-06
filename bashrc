@@ -105,3 +105,5 @@ export PYTHONSTARTUP=$HOME/.pythonrc.py
 PS1="\`if [ \$? != 0 ]; then echo 'FAIL '; fi\`\!+\j[\t]\u@\h[\W]:; "
 
 
+complete -C "perl -e '@w=split(/ /,\$ENV{COMP_LINE},-1);\$w=pop(@w);for(qx(screen -ls)){print qq/\$1\n/ if (/^\s*\$w/&&/(\d+\.\w+)/||/\d+\.(\$w\w*)/)}'" screen
+
