@@ -4,8 +4,8 @@ M = 1024 ** 2
 G = 1024 ** 3
 T = 1024 ** 4
 import sqlite3
-sqldb = sqlite3.connect("/home/hubt/python/sqldb")
-sql = sqldb.cursor()
+#sqldb = sqlite3.connect("/home/hubt/python/sqldb")
+#sql = sqldb.cursor()
 
 r = range(1,20)
 
