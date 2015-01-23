@@ -99,7 +99,7 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 fi
 
 
-PATH=/home/hubt/mongodb/bin:$PATH
+PATH=$HOME/bin:$PATH
 export PYTHONSTARTUP=$HOME/dotfiles/pythonrc.py
 #export PS1="\`if [ \$? = 0 ]; then echo ':)'; else echo ':('; fi\` \![\t]\u@\h[\W]\j:; "
 PS1="\`if [ \$? != 0 ]; then echo 'FAIL '; fi\`\!+\j[\t]\u@\h[\W]:; "
