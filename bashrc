@@ -103,7 +103,10 @@ PATH=$HOME/bin:$PATH
 export PYTHONSTARTUP=$HOME/dotfiles/pythonrc.py
 #export PS1="\`if [ \$? = 0 ]; then echo ':)'; else echo ':('; fi\` \![\t]\u@\h[\W]\j:; "
 PS1="\`if [ \$? != 0 ]; then echo 'FAIL '; fi\`\!+\j[\t]\u@\h[\W]:; "
+source $HOME/dotfiles/git-prompt.sh
+PS1="\!+\j[\t]\u@\h[\W\$(__git_ps1 "{%s}")]:; "
 
+alias j=jobs
 alias s=screen
 alias sd='screen -dr'
 

@@ -1,8 +1,10 @@
 
-\set show_slow_queries 'SELECT pid,query query FROM pg_stat_activity ORDER BY 1 DESC LIMIT 100;'
-\set slow_ 'select (query_start - now()),pid,query from pg_stat_activity order by query_start asc limit 20;'
+\set show_slow_queries 'SELECT pid,state,query query FROM pg_stat_activity ORDER BY 1 DESC LIMIT 100;'
+\set slow_ 'select (query_start - now()),pid,state,query from pg_stat_activity order by query_start asc limit 20;'
 
-\set slow_select 'select (query_start - now()),pid,query from pg_stat_activity  where query like \'SELECT%\' order by query_start asc limit 20;'
+\set kill 'SELECT pg_cancel_backend'
+\set slow_select 'select (now()-query_start),pid,query from pg_stat_activity  where query like \'SELECT%\' order by query_start asc limit 20;'
+\set PROMPT1 '%m:%/%R%# '
 \timing
 
 
