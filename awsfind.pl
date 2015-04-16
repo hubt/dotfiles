@@ -3,8 +3,11 @@
 use JSON::PP;
 # args are NAME=VALUE tags
 use Getopt::Long;
-my $csv;
-GetOptions('csv' =>\$csv);
+my $csv,$private;
+GetOptions(
+  'csv' =>\$csv,
+  'private' => \$private
+);
 
 if ( !@ARGV) {
   die "Usage: $0 TAGNAME=VALUE [ .. TAGNAME=VALUE] # tags are ANDED together ";
@@ -25,7 +28,11 @@ for $r (@{$j->{Reservations}}){
   for $i (@{$r->{Instances}}) {
     #my @fields = ($i->{PublicDnsName},$i->{PublicIpAddress},$i->{PrivateIpAddress});
     #my @fields = ($i->{PublicIpAddress});
-    push(@list,$i->{PublicIpAddress});
+    if ($private) {
+      push(@list,$i->{PrivateIpAddress});
+    } else {
+      push(@list,$i->{PublicIpAddress});
+    }
   }
 }
 
