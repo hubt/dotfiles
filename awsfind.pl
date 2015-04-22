@@ -3,10 +3,13 @@
 use JSON::PP;
 # args are NAME=VALUE tags
 use Getopt::Long;
-my $csv,$private;
+my $allips,$csv,$one,$private,$public;
 GetOptions(
+  '1' => \$one,
+  'allips' => \$allips,
   'csv' =>\$csv,
-  'private' => \$private
+  'private' => \$private,
+  'public' => \$public
 );
 
 if ( !@ARGV) {
@@ -28,7 +31,9 @@ for $r (@{$j->{Reservations}}){
   for $i (@{$r->{Instances}}) {
     #my @fields = ($i->{PublicDnsName},$i->{PublicIpAddress},$i->{PrivateIpAddress});
     #my @fields = ($i->{PublicIpAddress});
-    if ($private) {
+    if ($allips || ($private && $public)) {
+      push(@list,"$i->{PublicIpAddress}:$i->{PrivateIpAddress}");
+    } elsif ( $private ) {
       push(@list,$i->{PrivateIpAddress});
     } else {
       push(@list,$i->{PublicIpAddress});
@@ -36,6 +41,10 @@ for $r (@{$j->{Reservations}}){
   }
 }
 
+@list = sort @list;
+if ( $one ) {
+  @list = shift @list;
+}
 if ( $csv ) {
   print join(",",@list). "\n";
 } else {
