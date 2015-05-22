@@ -9,4 +9,4 @@
 \set PROMPT1 '%m:%/%R%# '
 \timing
 
-
+\set uptime 'select now()-pg_postmaster_start_time();'

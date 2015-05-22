@@ -3,13 +3,14 @@
 use JSON::PP;
 # args are NAME=VALUE tags
 use Getopt::Long;
-my $allips,$csv,$one,$private,$public;
+my $allips,$csv,$one,$private,$public,$raw;
 GetOptions(
   '1' => \$one,
   'allips' => \$allips,
   'csv' =>\$csv,
   'private' => \$private,
-  'public' => \$public
+  'public' => \$public,
+  'raw' => \$raw
 );
 
 if ( !@ARGV) {
@@ -25,7 +26,10 @@ $tag = join(" ", map { "Name=tag:$_,Values=$tags{$_}" } keys %tags);
 #JSON::PP
 $out = `aws ec2 describe-instances --filters $tag`;
 $j = decode_json($out);
-
+if ( $raw ) {
+  print $out;
+  exit;
+}
 my @list;
 for $r (@{$j->{Reservations}}){
   for $i (@{$r->{Instances}}) {
