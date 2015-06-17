@@ -3,13 +3,14 @@
 use JSON::PP;
 # args are NAME=VALUE tags
 use Getopt::Long;
-my $allips,$csv,$one,$private,$public,$raw;
+my $allips,$csv,$one,$private,$public,$raw,$info;
 GetOptions(
   '1' => \$one,
   'allips' => \$allips,
   'csv' =>\$csv,
   'private' => \$private,
   'public' => \$public,
+  'info' => \$info,
   'raw' => \$raw
 );
 
@@ -39,6 +40,21 @@ for $r (@{$j->{Reservations}}){
       push(@list,"$i->{PublicIpAddress}:$i->{PrivateIpAddress}");
     } elsif ( $private ) {
       push(@list,$i->{PrivateIpAddress});
+    } elsif ( $info ) {
+      @fields=("PublicIpAddress","PrivateIpAddress","InstanceType");
+      $r = {};
+      for(@fields) { 
+         $r->{$_} = $i->{$_};
+      }
+      my @tags;
+      for(@{$i->{Tags}}) {
+        push(@tags,"$_->{Key}=$_->{Value}");
+      }
+      $r->{Tags} = join(",",@tags);
+      #use Data::Dumper;
+      #print(Dumper($r));
+      #print(join(" ",sort keys %
+      push(@list,encode_json($r));
     } else {
       push(@list,$i->{PublicIpAddress});
     }
