@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
 use JSON::PP;
+$json = JSON::PP->new;
+$json->canonical(1);
 # args are NAME=VALUE tags
 use Getopt::Long;
 my $allips,$csv,$one,$private,$public,$raw,$info;
@@ -54,7 +56,7 @@ for $r (@{$j->{Reservations}}){
       #use Data::Dumper;
       #print(Dumper($r));
       #print(join(" ",sort keys %
-      push(@list,encode_json($r));
+      push(@list,$json->encode($r));
     } else {
       push(@list,$i->{PublicIpAddress});
     }
