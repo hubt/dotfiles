@@ -1,4 +1,9 @@
 import sys,os,re,json
+try:
+  import sh
+except:
+  pass
+
 K = 1024
 M = 1024 ** 2
 G = 1024 ** 3
@@ -30,6 +35,7 @@ else:
 
 import calendar
 import datetime
+import time
 def c(year=None):
   if year == None:
     year = datetime.date.today().year

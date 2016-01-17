@@ -43,7 +43,7 @@ for $r (@{$j->{Reservations}}){
     } elsif ( $private ) {
       push(@list,$i->{PrivateIpAddress});
     } elsif ( $info ) {
-      @fields=("PublicIpAddress","PrivateIpAddress","InstanceType");
+      @fields=("PublicIpAddress","PrivateIpAddress","InstanceType","InstanceId");
       $r = {};
       for(@fields) { 
          $r->{$_} = $i->{$_};
@@ -52,7 +52,7 @@ for $r (@{$j->{Reservations}}){
       for(@{$i->{Tags}}) {
         push(@tags,"$_->{Key}=$_->{Value}");
       }
-      $r->{Tags} = join(",",@tags);
+      $r->{Tags} = join(",",sort @tags);
       #use Data::Dumper;
       #print(Dumper($r));
       #print(join(" ",sort keys %

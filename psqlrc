@@ -1,12 +1,20 @@
 
 \set show_slow_queries 'SELECT pid,state,query query FROM pg_stat_activity ORDER BY 1 DESC LIMIT 100;'
-\set slow_ 'select (query_start - now()),pid,state,query from pg_stat_activity where state=\'active\' order by query_start asc limit 20;'
+\set slow_ 'select (query_start - now()),pid,state,client_addr,query from pg_stat_activity where state=\'active\' order by query_start asc limit 20;'
 \set slow_all 'select (query_start - now()),pid,state,query from pg_stat_activity order by query_start asc limit 20;'
 \set conns 'SELECT sum(numbackends) FROM pg_stat_database;'
 
 \set kill 'SELECT pg_cancel_backend'
+\set grep '%'
+\set pgrep 'select (now()-query_start),pid,client_addr,state,query from pg_stat_activity  where state=\'active\' and query like ':'grep'' order by query_start asc limit 20;'
+\set pkill 'select (now()-query_start),pid,client_addr,pg_terminate_backend(pid),state,query from pg_stat_activity  where state=\'active\' and query like ':'grep'' order by query_start asc limit 20;'
 \set slow_select 'select (now()-query_start),pid,query from pg_stat_activity  where query like \'SELECT%\' order by query_start asc limit 20;'
-\set PROMPT1 '%m:%/%R%# '
+\set PROMPT1 '%n@%m:%/%R%# '
 \timing
 
+\set lock 'select t.relname,l.locktype,page,virtualtransaction,l.pid,mode,granted,s.query from pg_locks l, pg_stat_all_tables t,pg_stat_activity s where l.relation=t.relid and s.pid=l.pid and schemaname <> \'pg_catalog\' order by relation asc;'
 \set uptime 'select now()-pg_postmaster_start_time();'
+\set conns 'select client_addr,count(*) from pg_stat_activity group by client_addr order by count desc;'
+\set estimate 'SELECT reltuples::bigint AS estimate FROM pg_class where relname=\'mytable\';'
+\set last_vacuum 'select relname,last_vacuum, last_autovacuum, last_analyze, last_autoanalyze from pg_stat_user_tables;'
+\pset pager off

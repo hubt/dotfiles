@@ -39,7 +39,7 @@ if has("gui_running")
 endif
 
 syntax on
-colorscheme default
+colorscheme desert
 hi Normal guifg=white guibg=black
 hi Search term=bold ctermbg=1
 hi Comment ctermfg=6 
