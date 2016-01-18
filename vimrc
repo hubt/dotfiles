@@ -2,18 +2,18 @@ set nocp
 set wildmode=longest,list
 set wildignore=*.class,*.o
 set shiftwidth=4
-set autoindent
 set expandtab
 set showmatch
-set wrapmargin=8
+" set wrapmargin=8
 set terse
 set wrapscan
 set nomagic
 set showmode
 set errorbells
 set incsearch
-map r :set wrapmargin=0
-map w :set wrapmargin=8
+" map r :set wrapmargin=0
+" map w :set wrapmargin=8
+set wrap linebreak nolist
 map ^I 
 map f {!}fmt}
 map q {!}fmt}

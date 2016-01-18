@@ -5,11 +5,12 @@ $json = JSON::PP->new;
 $json->canonical(1);
 # args are NAME=VALUE tags
 use Getopt::Long;
-my $allips,$csv,$one,$private,$public,$raw,$info;
+my $allips,$csv,$one,$private,$public,$raw,$info,$id;
 GetOptions(
   '1' => \$one,
   'allips' => \$allips,
   'csv' =>\$csv,
+  'id' => \$id,
   'private' => \$private,
   'public' => \$public,
   'info' => \$info,
@@ -27,7 +28,9 @@ for(@ARGV) {
 
 $tag = join(" ", map { "Name=tag:$_,Values=$tags{$_}" } keys %tags);
 #JSON::PP
-$out = `aws ec2 describe-instances --filters $tag`;
+$cmd= "aws ec2 describe-instances --output json --filters Name=instance-state-name,Values=running $tag";
+#print("$cmd\n");
+$out = `$cmd`;
 $j = decode_json($out);
 if ( $raw ) {
   print $out;
@@ -42,6 +45,8 @@ for $r (@{$j->{Reservations}}){
       push(@list,"$i->{PublicIpAddress}:$i->{PrivateIpAddress}");
     } elsif ( $private ) {
       push(@list,$i->{PrivateIpAddress});
+    } elsif ( $id ) {
+      push(@list,$i->{InstanceId});
     } elsif ( $info ) {
       @fields=("PublicIpAddress","PrivateIpAddress","InstanceType","InstanceId");
       $r = {};
