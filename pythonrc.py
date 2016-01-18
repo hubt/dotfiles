@@ -1,4 +1,4 @@
-import sys,os,re,json
+import sys,os,re,json,urllib2,requests
 try:
   import sh
 except:
