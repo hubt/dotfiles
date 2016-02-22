@@ -1,8 +1,11 @@
-import sys,os,re,json,urllib2,requests
+from __future__ import print_function
+import sys,os,re,json,requests
 try:
   import sh
 except:
   pass
+
+p = print
 
 K = 1024
 M = 1024 ** 2
@@ -14,6 +17,9 @@ import sqlite3
 
 r = range(1,20)
 
+import subprocess,shlex
+def shell(cmd):
+  return subprocess.check_output(shlex.split(cmd))
 
 class C(object):
   attr1 = "hello attr1"
@@ -109,3 +115,6 @@ else:
     sys.ps1 = Prompt1()
 sys.ps2 = Prompt2()
 
+from multiprocessing.dummy import Pool as ThreadPool
+#pool = ThreadPool(5)
+  
