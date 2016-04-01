@@ -114,4 +114,14 @@ complete -C "perl -e '@w=split(/ /,\$ENV{COMP_LINE},-1);\$w=pop(@w);for(qx(scree
 complete -C "perl -e '@w=split(/ /,\$ENV{COMP_LINE},-1);\$w=pop(@w);for(qx(screen -ls)){print qq/\$1\n/ if (/^\s*\$w/&&/(\d+.*?)\s||/\d+\.(\$w\w*)/)}'" s
 complete -C "perl -e '@w=split(/ /,\$ENV{COMP_LINE},-1);\$w=pop(@w);for(qx(screen -ls)){print qq/\$1\n/ if (/^\s*\$w/&&/(\d+.*?)\s/||/\d+\.(\$w\w*)/)}'" sd
 
+
+_complete_kubernetes_pod() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    COMPREPLY=( $(compgen -W "$(kubectl get pods|grep -v NAME | awk '{print $1}' | tr '\n' ' ')" -- $cur) )
+}
+complete -F _complete_kubernetes_pod kshell
+
+
 export EDITOR=vi
+eval "$(hub alias -s)"
+

@@ -12,7 +12,7 @@
 \set PROMPT1 '%n@%m:%/%R%# '
 \timing
 
-\set lock 'select t.relname,l.locktype,page,virtualtransaction,l.pid,mode,granted,s.query from pg_locks l, pg_stat_all_tables t,pg_stat_activity s where l.relation=t.relid and s.pid=l.pid and schemaname <> \'pg_catalog\' order by relation asc;'
+\set lock 'select t.relname,l.locktype,page,virtualtransaction,s.client_addr,l.pid,mode,granted,s.query from pg_locks l, pg_stat_all_tables t,pg_stat_activity s where l.relation=t.relid and s.pid=l.pid and schemaname <> \'pg_catalog\' order by relation asc;'
 \set uptime 'select now()-pg_postmaster_start_time();'
 \set conns 'select client_addr,count(*) from pg_stat_activity group by client_addr order by count desc;'
 \set estimate 'SELECT reltuples::bigint AS estimate FROM pg_class where relname=\'mytable\';'

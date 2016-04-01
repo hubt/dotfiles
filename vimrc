@@ -15,7 +15,7 @@ set incsearch
 " map w :set wrapmargin=8
 set wrap linebreak nolist
 map ^I 
-map f {!}fmt}
+map f {!}fmt -c}
 map q {!}fmt}
 map k :.,$-3d
 map a :set autoindent
