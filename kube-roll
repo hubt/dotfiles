@@ -19,7 +19,7 @@ fi
 if [ "$CONTEXT" == "" ] ; then
   CONTEXT=$(kubectl config current-context)
 fi
-HOOK=https://hooks.slack.com/services/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
+#HOOK=
 
 PATCH='{"spec":{"template":{"metadata":{"annotations":{"timestamp":"'$(date)'"}}}}}'
 
@@ -36,15 +36,8 @@ function slack() {
     curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"$1\", \"username\": \"service-roll-bot\", \"icon_emoji\": \":boom:\"}" $HOOK
   fi
 }
-if [ "$USER" == "circleci" ]; then
-  HOOK=https://hooks.slack.com/services/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
-  slack "*$USER* is rolling service *$APP* in cluster $CONTEXT"
-  kubectl patch deployment $APP -p "$PATCH" $KUBE_OPTS
-  kubectl rollout status deployment $APP $KUBE_OPTS
-  slack "*$USER* completed rolling service *$APP* in cluster $CONTEXT"
-else
-  slack "*$USER* is rolling service *$APP* in cluster $CONTEXT"
-  kubectl patch deployment $APP -p "$PATCH" $KUBE_OPTS
-  kubectl rollout status deployment $APP $KUBE_OPTS
-  slack "*$USER* completed rolling service *$APP* in cluster $CONTEXT"
-fi
+slack "*$USER* is rolling service *$APP* in cluster $CONTEXT"
+kubectl patch deployment $APP -p "$PATCH" $KUBE_OPTS
+kubectl rollout status deployment $APP $KUBE_OPTS
+slack "*$USER* completed rolling service *$APP* in cluster $CONTEXT"
+
