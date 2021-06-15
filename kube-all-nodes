@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ "$#" -lt 1 ]; then
+  echo "usage: $0 <command> "
+  echo "Executes a command on all kubernetes nodes(using your existing kube config context)"
+  echo "  eg: $0 'df -h'"
+  exit 1
+fi
+COMMAND=$@
+
+NODES=$(kubectl get nodes -o custom-columns --no-headers --template NAME:.metadata.name --sort-by .metadata.creationTimestamp)
+trap exit SIGINT
+
+for node in $NODES; do
+  echo $node
+  ssh $node -- "$COMMAND"
+done

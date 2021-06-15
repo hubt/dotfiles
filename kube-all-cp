@@ -1,0 +1,38 @@
+#!/bin/bash
+
+if [ "$#" -lt 3 ]; then
+  echo "usage: $0 [ -c <container> ] <app> <file> <destdir>"
+  exit 1
+fi
+while getopts ":c:" opt; do
+  case $opt in
+    c)
+      container=${OPTARG}
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+echo $@
+echo container: $container
+APP=$1
+shift
+FILE=$1
+shift
+DEST=$1
+
+PODS=$(kubectl get pods -l app=$APP -o 'jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}')
+#echo $PODS
+trap exit SIGINT
+
+for pod in $PODS; do
+  echo -- pod: $pod
+  mkdir -p $pod
+  if [ "$container" != "" ] ; then
+    kubectl cp -c ${container} $FILE $pod:$DEST/$(basename $FILE)
+  else
+    kubectl cp $FILE $pod:$DEST/$(basename $FILE)
+  fi
+done

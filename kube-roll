@@ -1,0 +1,50 @@
+#!/bin/bash
+
+if [ "$1" == "-s" ]; then
+  SILENT=1
+  shift
+fi
+if [ "$#" -eq 0 ]; then
+  echo "usage: $0 <app> [ namespace ]"
+  exit 1
+fi
+APP=$1
+
+if [[ ! -z "$2" ]]; then
+ KUBE_OPTS="-n $2"
+else
+ KUBE_OPTS=""
+fi
+
+if [ "$CONTEXT" == "" ] ; then
+  CONTEXT=$(kubectl config current-context)
+fi
+HOOK=https://hooks.slack.com/services/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
+
+PATCH='{"spec":{"template":{"metadata":{"annotations":{"timestamp":"'$(date)'"}}}}}'
+
+# Add new clusters here
+CLUSTERS=(prod production production-east1 aialik baltoro cygni jail dokriani embree foggydog grotto thanatos)
+
+function slack() {
+  MESSAGE=$1
+  if [ "$SILENT" != "" ] ; then
+    return
+  fi
+
+  if [[ " ${CLUSTERS[@]} " =~ " ${CONTEXT} " ]]; then
+    curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"$1\", \"username\": \"service-roll-bot\", \"icon_emoji\": \":boom:\"}" $HOOK
+  fi
+}
+if [ "$USER" == "circleci" ]; then
+  HOOK=https://hooks.slack.com/services/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
+  slack "*$USER* is rolling service *$APP* in cluster $CONTEXT"
+  kubectl patch deployment $APP -p "$PATCH" $KUBE_OPTS
+  kubectl rollout status deployment $APP $KUBE_OPTS
+  slack "*$USER* completed rolling service *$APP* in cluster $CONTEXT"
+else
+  slack "*$USER* is rolling service *$APP* in cluster $CONTEXT"
+  kubectl patch deployment $APP -p "$PATCH" $KUBE_OPTS
+  kubectl rollout status deployment $APP $KUBE_OPTS
+  slack "*$USER* completed rolling service *$APP* in cluster $CONTEXT"
+fi
