@@ -23,21 +23,6 @@ fi
 
 PATCH='{"spec":{"template":{"metadata":{"annotations":{"timestamp":"'$(date)'"}}}}}'
 
-# Add new clusters here
-CLUSTERS=(prod production production-east1 aialik baltoro cygni jail dokriani embree foggydog grotto thanatos)
-
-function slack() {
-  MESSAGE=$1
-  if [ "$SILENT" != "" ] ; then
-    return
-  fi
-
-  if [[ " ${CLUSTERS[@]} " =~ " ${CONTEXT} " ]]; then
-    curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"$1\", \"username\": \"service-roll-bot\", \"icon_emoji\": \":boom:\"}" $HOOK
-  fi
-}
-slack "*$USER* is rolling service *$APP* in cluster $CONTEXT"
 kubectl patch deployment $APP -p "$PATCH" $KUBE_OPTS
 kubectl rollout status deployment $APP $KUBE_OPTS
-slack "*$USER* completed rolling service *$APP* in cluster $CONTEXT"
 
