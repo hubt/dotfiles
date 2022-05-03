@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -e
+if [ "$#" -lt 1 ]; then
+  echo "usage: $0 [ -n <namespace> | -c <container> ] <app> [ command ] "
+  exit 1
+fi
+CONTAINER=""
+while getopts ":c:n:" opt; do
+  case $opt in
+    n)
+      NAMESPACE=${OPTARG}
+      ;;
+    c)
+      CONTAINER=${OPTARG}
+      ;;
+    *)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+  esac
+done
+
+shift $((OPTIND-1))
+APP=$1
+shift
+COMMAND="${@:-sh}"
+
+if [ -n "$NAMESPACE" ] ; then
+  NAMESPACE_ARGS="-n $NAMESPACE"
+fi
+
+POD=$(kubectl get pods $NAMESPACE_ARGS --no-headers | awk '{print $1}' | grep $APP | head -1)
+trap exit SIGINT
+
+if [ -n "$CONTAINER" ] ; then
+  CONTAINER_ARGS="-c $CONTAINER"
+fi
+
+echo kubectl exec $CONTAINER_ARGS $NAMESPACE_ARGS -it $POD -- $COMMAND
+kubectl exec $CONTAINER_ARGS $NAMESPACE_ARGS -it $POD -- $COMMAND

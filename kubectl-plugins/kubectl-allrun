@@ -1,0 +1,42 @@
+#!/bin/bash
+
+if [ "$#" -lt 2 ]; then
+  echo "usage: $0 [ -p <parallelism> | -n <namespace> | -c <container> ] <app> <command> "
+  exit 1
+fi
+PARALLEL=1
+CONTAINER=""
+while getopts ":p:c:n:" opt; do
+  case $opt in
+    p)
+      PARALLEL=${OPTARG}
+      ;;
+    n)
+      NAMESPACE=${OPTARG}
+      ;;
+    c)
+      CONTAINER=${OPTARG}
+      ;;
+    *)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+  esac
+done
+
+shift $((OPTIND-1))
+APP=$1
+shift
+COMMAND=$@
+
+if [ -n "$NAMESPACE" ] ; then
+  NAMESPACE_ARGS="-n $NAMESPACE"
+fi
+
+PODS=$(kubectl get pods $NAMESPACE_ARGS  -l app=$APP --no-headers | awk '{print $1}')
+trap exit SIGINT
+
+if [ -n "$CONTAINER" ] ; then
+  CONTAINER_ARGS="-c $CONTAINER"
+fi
+
+echo "$PODS" | xargs -n 1 -I {} -P $PARALLEL -- bash -c "kubectl exec $CONTAINER_ARGS $NAMESPACE_ARGS  -i {} -- sh -c 'echo -- pod: {}; $COMMAND'"

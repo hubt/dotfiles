@@ -1,0 +1,51 @@
+#!/bin/bash
+
+if [ "$#" -lt 2 ]; then
+  echo "usage: $0 [ -n <namespace> ] <service|pod>[:<port>] "
+  exit 1
+fi
+while getopts ":s:n:" opt; do
+  case $opt in
+    n)
+      NAMESPACE=${OPTARG}
+      ;;
+    *)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+  esac
+done
+
+shift $((OPTIND-1))
+APP=$1
+shift
+
+if [ -n "$NAMESPACE" ] ; then
+  NAMESPACE_ARGS="-n $NAMESPACE"
+fi
+
+function parse_line() {
+  line=shift
+  PORT=$(echo $line | sed s/:.*//)
+  echo "port: $PORT"
+}
+
+SERVICE=$(kubectl get svc $NAMESPACE_ARGS -o custom-columns --no-headers --template NAME:.metadata.name,PORTS:.spec.pod.containers.)
+
+
+echo $SERVICE
+if [ "$SERVICE" != "" ] ; then
+  COMMAND="kubectl port-forward svc $NAMESPACE_ARGS $APP:$PORT:80"
+else
+  POD=$(kubectl get pod $NAMESPACE_ARGS -o custom-columns --no-headers --template NAME:.metadata.name,PORTS:.spec.pod.containers.)
+  if [ "$POD" != "" ] ; then
+    COMMAND="kubectl port-forward pod $NAMESPACE_ARGS $APP:$PORT:80"
+  fi
+fi
+
+if [ "$COMMAND" == "" ] ; then
+  echo "No Service or Pod named $APP"
+  exit 1
+fi
+
+exec $COMMAND
+

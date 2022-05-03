@@ -1,0 +1,29 @@
+#!/bin/bash
+
+while getopts ":n:" opt; do
+  case $opt in
+    n)
+      NAMESPACE=${OPTARG}
+      ;;
+    *)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+  esac
+done
+
+shift $((OPTIND-1))
+APP=$1
+shift
+
+if [ "$APP" == "" ]; then
+  echo "usage: $0 [ -n <namespace> ] <regex> "
+  exit 1
+fi
+
+if [ -n "$NAMESPACE" ] ; then
+  NAMESPACE_ARGS="-n $NAMESPACE"
+fi
+
+POD=$(kubectl get po $NAMESPACE_ARGS | awk '{print $1}' | grep $APP | head -1)
+kubectl describe po $NAMESPACE_ARGS $POD
+
