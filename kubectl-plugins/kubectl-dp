@@ -20,6 +20,10 @@ if [ "$APP" == "" ]; then
   exit 1
 fi
 
+if [ -n "$ns" ] ; then
+  NAMESPACE_ARGS="-n $ns"
+fi
+
 if [ -n "$NAMESPACE" ] ; then
   NAMESPACE_ARGS="-n $NAMESPACE"
 fi

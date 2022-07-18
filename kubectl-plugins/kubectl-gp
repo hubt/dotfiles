@@ -15,14 +15,17 @@ shift $((OPTIND-1))
 APP=$1
 shift
 
-if [ "$APP" == "" ]; then
-  echo "usage: $0 [ -n <namespace> ] <regex> "
-  exit 1
+if [ -n "$ns" ] ; then
+  NAMESPACE_ARGS="-n $ns"
 fi
 
 if [ -n "$NAMESPACE" ] ; then
   NAMESPACE_ARGS="-n $NAMESPACE"
 fi
 
-kubectl get po $NAMESPACE_ARGS | grep $APP 
+if [ "$APP" == "" ]; then
+  kubectl get po $NAMESPACE_ARGS 
+else
+  kubectl get po $NAMESPACE_ARGS | grep $APP 
+fi
 
