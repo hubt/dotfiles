@@ -35,7 +35,7 @@ no_namespace="none"
 contexts.sort(key=lambda c: c['context']['cluster'] + " "+ (c['context']['namespace'] if 'namespace' in c['context'] else no_namespace ))
 i = 1
 context_lines = []
-table = [ [ "","","CONTEXT","CLUSTER","NAMESPACE","USER" ] ]
+table = [ [ "","#","CONTEXT","CLUSTER","NAMESPACE" ] ]
 for x in contexts:
   current = ""
   if 'namespace' in x['context']:
@@ -43,25 +43,37 @@ for x in contexts:
   else: 
     ns = no_namespace
   if x['name'] == config['current-context']:
-    current = "-->"
-  row = [ current,str(i),x['name'],x['context']['cluster'], ns,x['context']['user'] ]
+    current = True
+  else:
+    current = False
+  row = [ current,str(i),x['name'],x['context']['cluster'], ns ]
   table.append(row)
   i += 1
 
-# build a table with widths sized to the fields
+# build an array of the max widths for each field
 widths = [0] * len(table[0])
 for r in table:
-  for i in range(len(r)):
+  for i in range(1,len(r)):
     if len(r[i]) > widths[i]:
       widths[i] = len(r[i])
+# the first element is a boolean flag of the current config
+widths.pop(0)
+
+# build the string
 fstring = str.join(" ",map(lambda a: "{:<" + str(a) + "}",widths))
+# add green color to the format string for the current context
+cstring = u"\u001b[32m" + fstring + u"\u001b[0m"
 for r in table:
-  print(fstring.format(*r))
+  is_current = r.pop(0)
+  if is_current == True:
+    print(cstring.format(*r))
+  else:
+    print(fstring.format(*r))
 
 if "current-context" in config:
   print("\nCurrent context: " + config['current-context'])
 
-print("Set Context (1-{0} or name): ".format(i-1))
+print("Set Context (1-{0} or name): ".format(len(table)-1))
 try: 
   new_context = sys.stdin.readline()[0:-1]
 except KeyboardInterrupt:
@@ -69,10 +81,9 @@ except KeyboardInterrupt:
 if new_context.strip() == '':
   print("No change")
   sys.exit(0)
-context_list = filter(lambda c: c['name'] == new_context, contexts)
-if len(list(context_list)) > 0:
-  context_name = table[context_list][2]
-  print("Setting context to {0}".format(context_name))
+context_list = list(filter(lambda c: c['name'] == new_context, contexts))
+if len(context_list) > 0:
+  context_name = context_list[0]['name']
 else:
   c = int(new_context) - 1
   if c < 0 or c > len(contexts) - 1:
