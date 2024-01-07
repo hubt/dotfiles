@@ -1,17 +1,17 @@
 #!/bin/sh
 
+# run this on a pod inside the cluster to test whether dns is being slow 
 url=www.google.com
 sleep_time=.1
 iterations=100
 
 set -e
 # fetch kube-dns pod IPs(works from within cluster)
-fetch_kube_dns_pod_ips() {
-    curl -s -X GET "https://kubernetes.default.svc/api/v1/namespaces/kube-system/pods?labelSelector=k8s-app%3Dkube-dns" \
+ips=$(curl -s -X GET "https://kubernetes.default.svc/api/v1/namespaces/kube-system/pods?labelSelector=k8s-app%3Dkube-dns" \
          -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
          -H 'Accept: application/json' \
-         --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-}
+         --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
+     | grep -o '"podIP": *"[^"]*' | sed 's/"podIP": *"//')
 
 test_dns_curl() {
   curl --dns-servers $ip -k -s -S -o /dev/null -w  "URL:\t\t\t%{http_code} %{url_effective}\nDNS Lookup time:\t%{time_namelookup}\nTCP Connect:\t\t%{time_connect}\nTotal Time:\t\t%{time_total}\n" -H "Pragma: no-cache" $url
@@ -22,7 +22,7 @@ test_dns_nslookup() {
 }
 
 test_dns_dig() {
-  time dig @${ip} $url $ip
+  time dig @${ip} $url
 }
 
 
@@ -37,11 +37,9 @@ else
   exit 1
 fi
 
-kube_dns_output=$(fetch_kube_dns_pod_ips)
-ips=$(echo "$kube_dns_output" | grep -o '"podIP": *"[^"]*' | sed 's/"podIP": *"//')
 i=1; while [ $i -le $iterations ] ; do
     for ip in $ips; do
-        echo "=== DNS IP: $ip"
+        echo "=== Testing DNS IP: $ip"
         $test_dns
         echo
     done
