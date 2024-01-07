@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ "$(uname)" = "Darwin" ]; then
+  exec pbcopy $*
+elif [ "$(uname -a | grep WSL)" != "" ]; then
+  exec clip.exe $*
+fi
+

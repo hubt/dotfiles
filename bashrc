@@ -121,14 +121,6 @@ _complete_kubernetes_pod() {
 }
 complete -F _complete_kubernetes_pod kshell
 
-if [ "$(uname)" = "Darwin" ] ; then
-    alias ccut=pbcopy
-    alias cpaste=pbpaste
-elif [ "$(uname -a| grep WSL)" != "" ] ; then
-    alias ccut=clip.exe
-    alias cpaste='powershell.exec Get-Clipboard'
-fi
-
 export EDITOR=vi
 #eval "$(hub alias -s)"
 
