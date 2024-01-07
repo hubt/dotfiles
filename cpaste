@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ "$(uname)" = "Darwin" ]; then
+  exec pbpaste $*
+elif [ "$(uname -a | grep WSL)" != "" ]; then
+  exec powershell.exe Get-Clipboard $*
+fi
+
