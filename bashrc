@@ -121,6 +121,11 @@ _complete_kubernetes_pod() {
 }
 complete -F _complete_kubernetes_pod kshell
 
+if [ "$(uname)" = "Darwin" ] ; then
+    alias cb=pbcopy
+elif [ "$(uname | grep WSL)" != "" ] ; then
+    alias cb=clip.exe
+fi
 
 export EDITOR=vi
 eval "$(hub alias -s)"
