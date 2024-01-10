@@ -121,6 +121,14 @@ _complete_kubernetes_pod() {
 }
 complete -F _complete_kubernetes_pod kshell
 
+rr() {
+    eval "$(fc -ln -1) > /tmp/rr"
+}
+
 export EDITOR=vi
 #eval "$(hub alias -s)"
+
+if [ -f "$HOME/dotfiles/bashrc.local" ] ; then
+    source $HOME/dotfiles/bashrc.local
+fi
 
