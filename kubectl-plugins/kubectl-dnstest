@@ -5,14 +5,20 @@ url=www.google.com
 sleep_time=.1
 iterations=100
 
-set -e
 # fetch kube-dns pod IPs(works from within cluster)
-ips=$(curl -s -X GET "https://kubernetes.default.svc/api/v1/namespaces/kube-system/pods?labelSelector=k8s-app%3Dkube-dns" \
+pod_output=$(curl -s -X GET "https://kubernetes.default.svc/api/v1/namespaces/kube-system/pods?labelSelector=k8s-app%3Dkube-dns" \
          -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
          -H 'Accept: application/json' \
-         --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
-     | grep -o '"podIP": *"[^"]*' | sed 's/"podIP": *"//')
+         --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)
+ips=$( echo "$pod_output" | grep -o '"podIP": *"[^"]*' | sed 's/"podIP": *"//')
+if [ "$ip" = "" ] ; then
+    echo "$pod_output"
+    echo "Error retrieving kube-dns pods"
+    exit 1
+fi
 
+set -e
+set -o pipefail
 test_dns_curl() {
   curl --dns-servers $ip -k -s -S -o /dev/null -w  "URL:\t\t\t%{http_code} %{url_effective}\nDNS Lookup time:\t%{time_namelookup}\nTCP Connect:\t\t%{time_connect}\nTotal Time:\t\t%{time_total}\n" -H "Pragma: no-cache" $url
 }
