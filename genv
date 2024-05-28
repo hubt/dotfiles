@@ -1,0 +1,183 @@
+# this must be sourced by bash
+
+docs=<<DOC
+
+This is a set of functions and completions to manage many kubernetes clusters and gcp accounts from the command lines
+
+SETUP:
+set your .bashrc to source this genv file on startup
+
+to set it up, first set your gcp project with either
+  export CLOUDSDK_CORE_PROJECT=$project
+or
+  gcloud config set project $project
+
+then use the setup.sh command
+
+USAGE:
+the primary function is "e", short for environment
+
+usage:
+  e <project> [ gke_cluster ]
+the best most valuable part of these scripts are that they support tab completion, so just
+  e <tab>
+and you'll get a tab completion list of your known projects. doing an
+  e project <tab>
+will give you a tab completion of the known gke clusters in that project
+
+executing the e command then sets your gcp project and gke clusters. These are not set with the gcloud and kubectl commands, but instead they are set via environment variables(CLOUDSDK_CORE_PROJECT and KUBECONFIG). This is done so that you can have many different shells open and switching projects and clusters does not affet all your shells
+
+Internals:
+The setup.sh creates a directory per gcp project in ~/e and within each project directory creates a file with the kubeconfig for each cluster(and only that cluster). If you add more clusters later, just rerun the setup.sh
+
+DOC
+
+base_edir=~/e
+ignore_files="project.sh|gke_gcloud_auth_plugin_cache"
+function _get_clusters(){
+  project=$1
+  clusters=($(ls $base_edir/$project | egrep -v "$ignore_files" | tr '\n' ' ' ))
+}
+
+function e() {
+  project=$1
+  cluster=$2
+  if [ "$cluster" == "" ] ; then
+    _get_clusters $project
+    # select the cluster in the project if there is just one
+    if [ "${#clusters[@]}" == "1" ] ; then
+      echo "Selecting only cluster: ${clusters[@]}"
+      cluster=$clusters
+    else
+      echo "Select a cluster: ${clusters[@]}"
+      return
+    fi
+  fi
+  project_dir=$base_edir/$project
+  echo "GCP Project: $project"
+  echo "GKE Cluster: $cluster"
+  export CLOUDSDK_CORE_PROJECT=$project
+  export KUBECONFIG=$project_dir/$cluster
+  if [ -e "$project_dir/project.sh" ] ; then
+     echo Project config: $project_dir/project.sh
+     source $project_dir/project.sh
+  fi
+}
+
+function _complete_e() {
+  case $COMP_CWORD in
+    1)
+       COMPREPLY=( $(compgen -W "$(ls $base_edir)" ${COMP_WORDS[1]}) )
+       ;;
+    2)
+       COMPREPLY=( $(compgen -W "$(_get_clusters ${COMP_WORDS[1]} && echo ${clusters[@]})" ${COMP_WORDS[2]}) )
+       ;;
+  esac
+  return 0
+}
+complete -F _complete_e e
+
+work_profile="Profile 1"
+work_profile_dir="/Users/huchen/Library/Application Support/Google/Chrome/$work_profile"
+chrome="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+jira_projects=""
+function shortcut() {
+  feature=$1
+  project=$2
+  project=${2:-$CLOUDSDK_CORE_PROJECT}
+  project_dir=$base_edir/$project
+  shortcut_completions $feature $project
+  if [ "$feature" == "jira" ] ; then
+    echo "JIRA project: $project"
+  fi
+  echo "Opening: $feature for GCP Project: $project"
+  "$chrome" --profile-directory="$work_profile" --new-window $shortcut_url
+}
+
+shortcut_aliases="gke cloudsql vm billing ips vpc gcs pubsub logging iam monitoring bq bt grafana gdoc gmail gcal jira"
+function shortcut_completions() {
+  local feature=$1
+  local project=$2
+  case $feature in
+    gke)
+       shortcut_url="https://console.cloud.google.com/kubernetes/list/overview?project=$project"
+       ;;
+    cloudsql)
+       shortcut_url="https://console.cloud.google.com/sql/instances?project=$project"
+       ;;
+    billing)
+       shortcut_url="https://console.cloud.google.com/billing/linkedaccount?project=$project"
+       ;;
+    vm)
+       shortcut_url="https://console.cloud.google.com/compute/instances?project=$project"
+       ;;
+    ips)
+       shortcut_url="https://console.cloud.google.com/networking/addresses/list?project=$project"
+       ;;
+    vpc)
+       shortcut_url="https://console.cloud.google.com/networking/networks/list?project=$project"
+       ;;
+    gcs)
+       shortcut_url="https://console.cloud.google.com/storage/browser?project=$project"
+       ;;
+    pubsub)
+       shortcut_url="https://console.cloud.google.com/cloudpubsub/topic/list?project=$project"
+       ;;
+    logging)
+       shortcut_url="https://console.cloud.google.com/logs/query?project=$project"
+       ;;
+    iam)
+       shortcut_url="https://console.cloud.google.com/iam-admin/iam?project=$project"
+       ;;
+    monitoring)
+       shortcut_url="https://console.cloud.google.com/monitoring?project=$project"
+       ;;
+    bq)
+       shortcut_url="https://console.cloud.google.com/bigquery?project=$project"
+       ;;
+    bt)
+       shortcut_url="https://console.cloud.google.com/bigtable/instances?project=$project"
+       ;;
+    grafana)
+       shortcut_url="https://backend-gateway.diprd.cloud.pan.local/grafana/"
+       ;;
+    gdoc)
+       shortcut_url="https://docs.google.com"
+       ;;
+    gmail)
+       shortcut_url="https://mail.google.com"
+       ;;
+    gcal)
+       shortcut_url="https://calendar.google.com"
+       ;;
+    jira)
+       if [ "$(echo $project|grep -- -)" != "" ] ; then
+           shortcut_url="https://jira-dc.paloaltonetworks.com/browse/$project"
+       else
+           shortcut_url="https://jira-dc.paloaltonetworks.com/projects/$project/issues"
+       fi
+       ;;
+    *)
+       shortcut_url=""
+       ;;
+  esac
+  return 0
+}
+
+function _complete_shortcut() {
+  case $COMP_CWORD in
+    1)
+       COMPREPLY=( $(compgen -W "$shortcut_aliases" ${COMP_WORDS[1]}) )
+       ;;
+    2)
+       COMPREPLY=( $(compgen -W "$(ls $base_edir)" ${COMP_WORDS[2]}) )
+       if [ "${COMP_WORDS[1]}" == "jira" ]; then
+           COMPREPLY=( $(compgen -W "$jira_projects" ${COMP_WORDS[2]}) )
+       fi
+       ;;
+  esac
+  return 0
+}
+complete -F _complete_shortcut shortcut
+alias o=shortcut
+complete -F _complete_shortcut o
