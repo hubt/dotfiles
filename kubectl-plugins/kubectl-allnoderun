@@ -11,7 +11,9 @@ COMMAND=$@
 NODES=$(kubectl get nodes -o custom-columns --no-headers --template NAME:.metadata.name --sort-by .metadata.creationTimestamp)
 trap exit SIGINT
 
+SSH=${SSH:=ssh}
+
 for node in $NODES; do
   echo $node
-  ssh $node -- "$COMMAND"
+  $SSH $node -- "$COMMAND"
 done
