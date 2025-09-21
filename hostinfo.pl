@@ -3,7 +3,7 @@
 print "== Vendor ==\n";
 print `dmidecode | grep "Product Name"`;
 print "== CPUs ==\n";
-print `cat /proc/cpuinfo | egrep '(processor|model name)'`;
+print `cat /proc/cpuinfo | grep -E '(processor|model name)'`;
 print "== Distro ==\n";
 print `cat /etc/*release`;
 print "== Kernel ==\n";

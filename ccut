@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [ "$(echo $BYOBU_BACKEND | grep tmux)" != "" ]; then
+  exec tmux load-buffer -
+fi
+
 if [ "$(uname)" = "Darwin" ]; then
   exec pbcopy $*
 elif [ "$(uname -a | grep WSL)" != "" ]; then

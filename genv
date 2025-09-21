@@ -2,76 +2,286 @@
 
 docs=<<DOC
 
-This is a set of functions and completions to manage many kubernetes clusters and gcp accounts from the command lines
+This is a set of functions and completions to manage many Kubernetes clusters and cloud accounts from the command line.
 
 SETUP:
-set your .bashrc to source this genv file on startup
-
-to set it up, first set your gcp project with either
+source this file from your shell init (e.g., bashrc). For GCP, either:
   export CLOUDSDK_CORE_PROJECT=$project
 or
   gcloud config set project $project
 
-then use the setup.sh command
+then use the setup.sh command to generate kubeconfigs for GKE.
 
 USAGE:
-the primary function is "e", short for environment
+primary function: "e" (short for environment)
 
-usage:
-  e <project> [ gke_cluster ]
-the best most valuable part of these scripts are that they support tab completion, so just
-  e <tab>
-and you'll get a tab completion list of your known projects. doing an
-  e project <tab>
-will give you a tab completion of the known gke clusters in that project
+usage (backward compatible):
+  e <gcp_project> [gke_cluster]
 
-executing the e command then sets your gcp project and gke clusters. These are not set with the gcloud and kubectl commands, but instead they are set via environment variables(CLOUDSDK_CORE_PROJECT and KUBECONFIG). This is done so that you can have many different shells open and switching projects and clusters does not affet all your shells
+multi-cloud usage:
+  e gcp   <project>      [cluster]
+  e aws   <aws_profile>  [cluster]
+  e azure <subscription> [cluster]
+
+Tab completion helps list projects/profiles/subscriptions and clusters.
+
+Behavior:
+e sets cloud-specific env vars and KUBECONFIG pointing at per-account/cluster files under:
+  GCP:   ~/e/<project>/<cluster>
+  AWS:   ~/e-aws/<profile>/<cluster>
+  Azure: ~/e-azure/<subscription>/<cluster>
 
 Internals:
-The setup.sh creates a directory per gcp project in ~/e and within each project directory creates a file with the kubeconfig for each cluster(and only that cluster). If you add more clusters later, just rerun the setup.sh
+setup.sh creates per-GCP-project kubeconfig files. For AWS/Azure, create similar directories and point KUBECONFIG there; populate kubeconfigs via your own tooling (e.g., aws eks update-kubeconfig / az aks get-credentials).
 
 DOC
 
-base_edir=~/e
-ignore_files="project.sh|gke_gcloud_auth_plugin_cache"
-function _get_clusters(){
-  project=$1
-  clusters=($(ls $base_edir/$project | egrep -v "$ignore_files" | tr '\n' ' ' ))
+# Base directories per provider
+base_edir_gcp="$HOME/e"
+base_edir_aws="$HOME/e-aws"
+base_edir_azure="$HOME/e-azure"
+
+# Backward-compat default (GCP)
+base_edir="$base_edir_gcp"
+
+ignore_files='project.sh|account.sh|gke_gcloud_auth_plugin_cache'
+
+_get_clusters() {
+  local basedir="$1"
+  local account="$2"
+  clusters=($(ls "$basedir/$account" 2>/dev/null | grep -E -v "$ignore_files" | tr '\n' ' '))
 }
 
-function e() {
-  project=$1
-  cluster=$2
-  if [ "$cluster" == "" ] ; then
-    _get_clusters $project
-    # select the cluster in the project if there is just one
-    if [ "${#clusters[@]}" == "1" ] ; then
+_provider_base() {
+  # echo the base dir for a provider
+  case "$1" in
+    gcp|GCP|google) echo "$base_edir_gcp" ;;
+    aws|AWS)        echo "$base_edir_aws" ;;
+    azure|AZURE|az) echo "$base_edir_azure" ;;
+    *)              echo "$base_edir_gcp" ;;
+  esac
+}
+
+# Azure helpers: map subscription name <-> id using Azure CLI profile
+_azure_profile_json="$HOME/.azure/azureProfile.json"
+_azure_lookup_id() {
+  local q="$1" id=""
+  [ -f "$_azure_profile_json" ] || { printf "%s" "$q"; return; }
+  if command -v jq >/dev/null 2>&1; then
+    id=$(jq -r --arg q "$q" '.subscriptions[]? | select(.id==$q or .name==$q) | .id' "$_azure_profile_json" 2>/dev/null | head -n1)
+  else
+    id=$(awk -v s="$q" '
+      {
+        if (match($0, /"id"[[:space:]]*:[[:space:]]*"([^"]+)"/, m)) idv=m[1]
+        if (match($0, /"name"[[:space:]]*:[[:space:]]*"([^"]+)"/, n)) nmv=n[1]
+        if (idv != "" && nmv != "") {
+          if (idv==s || nmv==s) { print idv; exit }
+          idv=""; nmv=""
+        }
+      }
+    ' "$_azure_profile_json" 2>/dev/null)
+  fi
+  printf "%s" "${id:-$q}"
+}
+_azure_lookup_name() {
+  local q="$1" name=""
+  [ -f "$_azure_profile_json" ] || return 1
+  if command -v jq >/dev/null 2>&1; then
+    name=$(jq -r --arg q "$q" '.subscriptions[]? | select(.id==$q or .name==$q) | .name' "$_azure_profile_json" 2>/dev/null | head -n1)
+  else
+    name=$(awk -v s="$q" '
+      {
+        if (match($0, /"id"[[:space:]]*:[[:space:]]*"([^"]+)"/, m)) idv=m[1]
+        if (match($0, /"name"[[:space:]]*:[[:space:]]*"([^"]+)"/, n)) nmv=n[1]
+        if (idv != "" && nmv != "") {
+          if (idv==s || nmv==s) { print nmv; exit }
+          idv=""; nmv=""
+        }
+      }
+    ' "$_azure_profile_json" 2>/dev/null)
+  fi
+  [ -n "$name" ] || return 1
+  printf "%s" "$name"
+}
+_azure_resolve_dirname() {
+  # Given an account token (id or name), return the dirname under e-azure
+  local acct="$1" cand
+  if [ -d "$base_edir_azure/$acct" ]; then
+    printf "%s" "$acct"; return 0
+  fi
+  cand=$(_azure_lookup_id "$acct")
+  if [ -d "$base_edir_azure/$cand" ]; then
+    printf "%s" "$cand"; return 0
+  fi
+  printf "%s" "$acct"
+}
+
+e() {
+  local provider="$1"
+  local account
+  local cluster
+
+  # Backward-compatible default: if first arg is not a known provider, treat as GCP project
+  case "$provider" in
+    gcp|GCP|google|aws|AWS|azure|AZURE|az) ;;
+    *) account="$provider"; provider="gcp"; cluster="$2" ;;
+  esac
+
+  # If provider explicitly provided, shift args
+  if [ -z "$account" ]; then
+    account="$2"
+    cluster="$3"
+  fi
+
+  local basedir account_dir
+  basedir=$(_provider_base "$provider")
+  # For Azure, allow account to be subscription name or ID; resolve to on-disk dirname
+  if [ "$provider" = "azure" ] || [ "$provider" = "AZURE" ] || [ "$provider" = "az" ]; then
+    account_dir="$basedir/$(_azure_resolve_dirname "$account")"
+  else
+    account_dir="$basedir/$account"
+  fi
+
+  if [ -z "$cluster" ] ; then
+    _get_clusters "$basedir" "$account"
+    if [ "${#clusters[@]}" = "1" ] ; then
       echo "Selecting only cluster: ${clusters[@]}"
-      cluster=$clusters
+      cluster=${clusters[0]}
     else
       echo "Select a cluster: ${clusters[@]}"
       return
     fi
   fi
-  project_dir=$base_edir/$project
-  echo "GCP Project: $project"
-  echo "GKE Cluster: $cluster"
-  export CLOUDSDK_CORE_PROJECT=$project
-  export KUBECONFIG=$project_dir/$cluster
-  if [ -e "$project_dir/project.sh" ] ; then
-     echo Project config: $project_dir/project.sh
-     source $project_dir/project.sh
-  fi
+
+  mkdir -p "$account_dir" 2>/dev/null || true
+
+  case "$provider" in
+    gcp|GCP|google)
+      echo "GCP Project: $account"
+      echo "GKE Cluster: $cluster"
+      export CLOUDSDK_CORE_PROJECT="$account"
+      export KUBECONFIG="$account_dir/$cluster"
+      if [ -e "$account_dir/project.sh" ] ; then
+        echo "Project config: $account_dir/project.sh"
+        # shellcheck disable=SC1090
+        . "$account_dir/project.sh"
+      fi
+      ;;
+    aws|AWS)
+      echo "AWS Profile: $account"
+      echo "EKS Cluster: $cluster"
+      export AWS_PROFILE="$account"
+      export KUBECONFIG="$account_dir/$cluster"
+      if [ -f "$account_dir/config" ] ; then
+        export AWS_CONFIG_FILE="$account_dir/config"
+        echo "Using AWS_CONFIG_FILE: $AWS_CONFIG_FILE"
+      fi
+      if [ -f "$account_dir/credentials" ] ; then
+        export AWS_SHARED_CREDENTIALS_FILE="$account_dir/credentials"
+        echo "Using AWS_SHARED_CREDENTIALS_FILE: $AWS_SHARED_CREDENTIALS_FILE"
+      fi
+      if [ -e "$account_dir/account.sh" ] ; then
+        echo "Account config: $account_dir/account.sh"
+        # shellcheck disable=SC1090
+        . "$account_dir/account.sh"
+      fi
+      ;;
+    azure|AZURE|az)
+      echo "Azure Subscription: $account"
+      echo "AKS Cluster: $cluster"
+      # Export both ID and Name when possible
+      local sub_id sub_name
+      sub_id=$(_azure_lookup_id "$account")
+      sub_name=$(_azure_lookup_name "$account" 2>/dev/null || true)
+      export AZURE_SUBSCRIPTION_ID="$sub_id"
+      [ -n "$sub_name" ] && export AZURE_SUBSCRIPTION_NAME="$sub_name"
+      export KUBECONFIG="$account_dir/$cluster"
+      if [ -e "$account_dir/account.sh" ] ; then
+        echo "Account config: $account_dir/account.sh"
+        # shellcheck disable=SC1090
+        . "$account_dir/account.sh"
+      fi
+      ;;
+  esac
 }
 
-function _complete_e() {
+_complete_e() {
+  local cur prev
+  cur=${COMP_WORDS[COMP_CWORD]}
+  prev=${COMP_WORDS[COMP_CWORD-1]}
+
+  # Helpers for fallback discovery when no local dirs yet
+  _aws_profiles() {
+    local cfg creds
+    cfg="$HOME/.aws/config"; creds="$HOME/.aws/credentials"
+    {
+      [ -f "$cfg" ] && sed -n 's/^\[profile \([^]]*\)\]$/\1/p' "$cfg"
+      [ -f "$creds" ] && sed -n 's/^\[\([^]]*\)\]$/\1/p' "$creds"
+    } 2>/dev/null | sort -u | tr '\n' ' '
+  }
+  _azure_subscriptions() {
+    # Print subscription names, one per line
+    if command -v az >/dev/null 2>&1; then
+      az account list -o tsv --query '[].name' 2>/dev/null
+    fi
+  }
+  _dirnames_nl() {
+    # Print basenames under a dir, one per line
+    local dir="$1"
+    if [ -d "$dir" ]; then
+      ls -1 "$dir" 2>/dev/null
+    fi
+  }
+
   case $COMP_CWORD in
     1)
-       COMPREPLY=( $(compgen -W "$(ls $base_edir)" ${COMP_WORDS[1]}) )
-       ;;
+      COMPREPLY=( $(compgen -W "aws azure gcp $(ls "$base_edir_gcp" 2>/dev/null)" -- "$cur") )
+      ;;
     2)
-       COMPREPLY=( $(compgen -W "$(_get_clusters ${COMP_WORDS[1]} && echo ${clusters[@]})" ${COMP_WORDS[2]}) )
-       ;;
+      case ${COMP_WORDS[1]} in
+        aws|AWS)
+          local opts
+          opts="$(ls "$base_edir_aws" 2>/dev/null) $(_aws_profiles)"
+          COMPREPLY=( $(compgen -W "$opts" -- "$cur") ) ;;
+        azure|AZURE|az)
+          local name
+          local -a opts_arr
+          # Enable filename-style completion so spaces are handled/escaped
+          compopt -o filenames 2>/dev/null || true
+          while IFS= read -r name; do
+            opts_arr+=("$name")
+          done < <(_dirnames_nl "$base_edir_azure")
+          while IFS= read -r name; do
+            opts_arr+=("$name")
+          done < <(_azure_subscriptions)
+          COMPREPLY=()
+          for name in "${opts_arr[@]}"; do
+            [[ "$name" == "$cur"* ]] && COMPREPLY+=("$name")
+          done
+          ;;
+        gcp|GCP|google)
+          COMPREPLY=( $(compgen -W "$(ls "$base_edir_gcp" 2>/dev/null)" -- "$cur") ) ;;
+        *)
+          COMPREPLY=( $(compgen -W "$(_get_clusters "$base_edir_gcp" "${COMP_WORDS[1]}" && echo ${clusters[@]})" -- "$cur") ) ;;
+      esac
+      ;;
+    3|4|5|6|7|8)
+      case ${COMP_WORDS[1]} in
+        aws|AWS)
+          COMPREPLY=( $(compgen -W "$(_get_clusters "$base_edir_aws" "${COMP_WORDS[2]}" && echo ${clusters[@]})" -- "$cur") ) ;;
+        azure|AZURE|az)
+          # Reconstruct account from words 2..(COMP_CWORD-1) to handle spaces
+          local i account="" resolved=""
+          for (( i=2; i<COMP_CWORD; i++ )); do
+            if [ -z "$account" ]; then account="${COMP_WORDS[i]}"; else account+=" ${COMP_WORDS[i]}"; fi
+          done
+          compopt -o filenames 2>/dev/null || true
+          resolved=$(_azure_resolve_dirname "$account")
+          COMPREPLY=( $(compgen -W "$(_get_clusters "$base_edir_azure" "$resolved" && echo ${clusters[@]})" -- "$cur") ) ;;
+        gcp|GCP|google)
+          COMPREPLY=( $(compgen -W "$(_get_clusters "$base_edir_gcp" "${COMP_WORDS[2]}" && echo ${clusters[@]})" -- "$cur") ) ;;
+      esac
+      ;;
   esac
   return 0
 }

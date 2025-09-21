@@ -57,13 +57,13 @@ fi
 unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
+#case "$TERM" in
+#xterm*|rxvt*)
+#    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+#    ;;
+#*)
+#    ;;
+#esac
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -73,8 +73,8 @@ if [ -x /usr/bin/dircolors ]; then
     #alias vdir='vdir --color=auto'
 
     alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
+    alias fgrep='grep -F --color=auto'
+    alias egrep='grep -E --color=auto'
 fi
 
 # some more ls aliases
@@ -100,11 +100,11 @@ fi
 
 
 PATH=$HOME/bin:$PATH
-export PYTHONSTARTUP=$HOME/dotfiles/pythonrc.py
+export PYTHONSTARTUP=$HOME/git/dotfiles/pythonrc.py
 #export PS1="\`if [ \$? = 0 ]; then echo ':)'; else echo ':('; fi\` \![\t]\u@\h[\W]\j:; "
-PS1="\`if [ \$? != 0 ]; then echo 'FAIL '; fi\`\!+\j[\t]\u@\h[\W]:; "
-source $HOME/dotfiles/git-prompt.sh
-PS1="\!+\j[\t]\u@\h[\W\$(__git_ps1 "{%s}")]:; "
+#PS1="\`if [ \$? != 0 ]; then echo 'FAIL '; fi\`\!+\j[\t]\u@\h[\W]:; "
+source $HOME/git/dotfiles/git-prompt.sh
+#PS1="\!+\j[\t]\u@\h[\W\$(__git_ps1 "{%s}")]:; "
 
 alias j=jobs
 alias s=screen
@@ -132,3 +132,90 @@ if [ -f "$HOME/dotfiles/bashrc.local" ] ; then
     source $HOME/dotfiles/bashrc.local
 fi
 
+# Resolve Azure subscription name from ~/.azure/azureProfile.json
+__azure_sub_name() {
+    local sub="$1"
+    local prof="$HOME/.azure/azureProfile.json"
+    local name=""
+    [ -f "$prof" ] || return 1
+    if command -v jq >/dev/null 2>&1; then
+        name=$(jq -r --arg sub "$sub" '.subscriptions[]? | select(.id==$sub or .name==$sub) | .name' "$prof" 2>/dev/null | head -n1)
+    else
+        name=$(awk -v s="$sub" '
+            {
+              if (match($0, /"id"[[:space:]]*:[[:space:]]*"([^"]+)"/, m)) id=m[1]
+              if (match($0, /"name"[[:space:]]*:[[:space:]]*"([^"]+)"/, n)) nm=n[1]
+              if (id != "" && nm != "") {
+                if (id==s || nm==s) { print nm; exit }
+                id=""; nm=""
+              }
+            }
+        ' "$prof" 2>/dev/null)
+    fi
+    [ -n "$name" ] || return 1
+    printf "%s" "$name"
+}
+
+# Cloud context for prompt based on KUBECONFIG location (multi-cloud)
+__cloud_ps1() {
+    # Use the first kubeconfig path if multiple are set
+    local kc="${KUBECONFIG%%:*}"
+    [ -z "$kc" ] && return 0
+    # Normalize $HOME
+    local home="${HOME%/}"
+    case "$kc" in
+        "$home"/e/*/*)
+            # GCP: ~/e/<project>/<cluster>
+            local project cluster
+            project=$(basename "$(dirname "$kc")")
+            cluster=$(basename "$kc")
+            printf " {gcp:%s/%s}" "$project" "$cluster"
+            ;;
+        "$home"/e-aws/*/*)
+            # AWS: ~/e-aws/<profile>/<cluster>
+            local profile cluster
+            profile=$(basename "$(dirname "$kc")")
+            cluster=$(basename "$kc")
+            printf " {aws:%s/%s}" "$profile" "$cluster"
+            ;;
+        "$home"/e-azure/*/*)
+            # Azure: ~/e-azure/<subscription>/<cluster>
+            # Prefer human-friendly subscription name from local profile, avoid exposing full ID.
+            local sub cluster account_dir name masked sublen first4 last4
+            sub=$(basename "$(dirname "$kc")")
+            account_dir="$(dirname "$kc")"
+            cluster=$(basename "$kc")
+            name=""
+            # Prefer lookup from Azure CLI profile
+            name="$(__azure_sub_name "$sub" 2>/dev/null || true)"
+            # Else use already-exported name if present (from e/acc switch), else source local profile
+            if [ -z "$name" ]; then
+              if [ -n "$AZURE_SUBSCRIPTION_NAME" ]; then
+                name="$AZURE_SUBSCRIPTION_NAME"
+              elif [ -f "$account_dir/account.sh" ]; then
+                # shellcheck disable=SC1090
+                . "$account_dir/account.sh" >/dev/null 2>&1 || true
+                name="${AZURE_SUBSCRIPTION_NAME:-${SUBSCRIPTION_NAME:-${AZ_SUBSCRIPTION_NAME:-}}}"
+              fi
+            fi
+            if [ -n "$name" ]; then
+              printf " {azure:%s/%s}" "$name" "$cluster"
+            else
+              # Fallback: mask long IDs, otherwise show the directory label
+              sublen=${#sub}
+              if [ "$sublen" -gt 8 ]; then
+                first4=${sub:0:4}
+                last4=${sub:$sublen-4:4}
+                masked="${first4}...${last4}"
+              else
+                masked="$sub"
+              fi
+              printf " {azure:%s/%s}" "$masked" "$cluster"
+            fi
+            ;;
+    esac
+}
+
+# Override PS1 to include Git and cloud context
+PS1="\!+\j[\t]\u@\h[\W\$(__git_ps1 "{%s}")\$(__cloud_ps1)]:; "
+export PYTHONWARNINGS="ignore::FutureWarning"
