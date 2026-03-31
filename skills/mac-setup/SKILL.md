@@ -14,6 +14,6 @@ install chrome
 install homebrew
 install ghostty
 install git
-git clone http://github.com/hubt/dotfiles
+git clone https://github.com/hubt/dotfiles
 
 
