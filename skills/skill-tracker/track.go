@@ -70,7 +70,7 @@ type TranscriptEntry struct {
 
 // ── paths ─────────────────────────────────────────────────────────────────────
 
-var trackerDir = filepath.Dir(os.Args[0])
+var trackerDir = filepath.Dir(os.Args[0]) // config.json and counts.json live alongside the binary
 var skillsDir = filepath.Join(os.Getenv("HOME"), ".claude", "skills")
 var countsPath = filepath.Join(trackerDir, "counts.json")
 var stateDir = filepath.Join(os.TempDir(), "skill-tracker")
@@ -231,8 +231,9 @@ func transcriptSize(path string) int64 {
 	return info.Size()
 }
 
-// estimateCostUSD uses claude-sonnet-4-6 pricing (per-token, as of 2025).
+// estimateCostUSD uses claude-sonnet-4-6 pricing (per-token, rates captured 2026-03).
 // Input $3/MTok, Output $15/MTok, Cache write $3.75/MTok, Cache read $0.30/MTok.
+// Update these constants when pricing changes.
 func estimateCostUSD(t tokenTotals) float64 {
 	const M = 1_000_000.0
 	return float64(t.input)*3.0/M +

@@ -88,13 +88,6 @@ echo "## Project types detected"
 
 CHANGED_FILES=$(git diff --name-only "${MERGE_BASE}..HEAD")
 
-detect() {
-  local label="$1" root_file="$2" ext="$3"
-  if [ -f "$root_file" ] || echo "$CHANGED_FILES" | grep -qE "$ext"; then
-    echo "- $label"
-  fi
-}
-
 [ -f go.mod ]            && echo "- Go (go.mod found)"
 [ -f package.json ]      && echo "- TypeScript/JS (package.json found)"
 [ -f pyproject.toml ] || [ -f setup.py ] || [ -f requirements.txt ] \
