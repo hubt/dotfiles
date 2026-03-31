@@ -100,11 +100,11 @@ fi
 
 
 PATH=$HOME/bin:$PATH
-export PYTHONSTARTUP=$HOME/git/dotfiles/pythonrc.py
+export PYTHONSTARTUP="$(dirname "${BASH_SOURCE[0]}")/pythonrc.py"
 #export PS1="\`if [ \$? = 0 ]; then echo ':)'; else echo ':('; fi\` \![\t]\u@\h[\W]\j:; "
-#PS1="\`if [ \$? != 0 ]; then echo 'FAIL '; fi\`\!+\j[\t]\u@\h[\W]:; "
-source $HOME/git/dotfiles/git-prompt.sh
-#PS1="\!+\j[\t]\u@\h[\W\$(__git_ps1 "{%s}")]:; "
+PS1="\`if [ \$? != 0 ]; then echo 'FAIL '; fi\`\!+\j[\t]\u@\h[\W]:; "
+source "$(dirname "${BASH_SOURCE[0]}")/git-prompt.sh"
+PS1="\!+\j[\t]\u@\h[\W\$(__git_ps1 "{%s}")]:; "
 
 alias j=jobs
 alias s=screen
@@ -128,8 +128,8 @@ rr() {
 export EDITOR=vi
 #eval "$(hub alias -s)"
 
-if [ -f "$HOME/dotfiles/bashrc.local" ] ; then
-    source $HOME/dotfiles/bashrc.local
+if [ -f "$(dirname "${BASH_SOURCE[0]}")/bashrc.local" ] ; then
+    source "$(dirname "${BASH_SOURCE[0]}")/bashrc.local"
 fi
 
 # Resolve Azure subscription name from ~/.azure/azureProfile.json
