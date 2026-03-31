@@ -16,4 +16,4 @@ install ghostty
 install git
 git clone https://github.com/hubt/dotfiles
 
-
+install ag (silver_searcher)
