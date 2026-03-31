@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "$(echo $BYOBU_BACKEND | grep tmux)" != "" ]; then
+if echo "$BYOBU_BACKEND" | grep -q tmux; then
   exec tmux load-buffer -
 fi
 

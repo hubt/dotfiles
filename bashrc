@@ -201,7 +201,7 @@ __cloud_ps1() {
             if [ -n "$name" ]; then
               printf " {azure:%s/%s}" "$name" "$cluster"
             else
-              # Fallback: mask long IDs, otherwise show the directory label
+              # Fallback: mask UUID-style subscription IDs to avoid leaking the full ID in PS1
               sublen=${#sub}
               if [ "$sublen" -gt 8 ]; then
                 first4=${sub:0:4}
