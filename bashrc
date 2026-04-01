@@ -216,6 +216,7 @@ __cloud_ps1() {
     esac
 }
 
+source "$(dirname "${BASH_SOURCE[0]}")/genv"
 # Override PS1 to include Git and cloud context
 PS1="\!+\j[\t]\u@\h[\W\$(__git_ps1 "{%s}")\$(__cloud_ps1)]:; "
 export PYTHONWARNINGS="ignore::FutureWarning"

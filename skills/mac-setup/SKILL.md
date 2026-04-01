@@ -12,8 +12,10 @@ map fn key to control key
 chsh -s /bin/bash
 install chrome
 install homebrew
-install ghostty
+install ghostty && copy ghosttyrc
 install git
 git clone https://github.com/hubt/dotfiles
 
 install ag (silver_searcher)
+install aws cli
+install gcloud
