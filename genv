@@ -23,7 +23,13 @@ multi-cloud usage:
   e aws   <aws_profile>  [cluster]
   e azure <subscription> [cluster]
 
-Tab completion helps list projects/profiles/subscriptions and clusters.
+shortcut: specify only the cluster name and the provider/account are resolved automatically:
+  e <cluster>
+
+Tab completion at the first argument lists GCP projects, provider keywords (aws/gcp/azure),
+and all cluster names across every provider — so 'e <Tab>' shows everything at once.
+If the cluster name is unique across providers, the right env vars are set automatically.
+If it matches multiple accounts, the candidates are printed for disambiguation.
 
 Behavior:
 e sets cloud-specific env vars and KUBECONFIG pointing at per-account/cluster files under:
@@ -50,6 +56,39 @@ _get_clusters() {
   local basedir="$1"
   local account="$2"
   clusters=($(ls "$basedir/$account" 2>/dev/null | grep -E -v "$ignore_files" | tr '\n' ' '))
+}
+
+# Returns "provider account cluster" for each provider dir that contains cluster_name
+_find_cluster() {
+  local cluster_name="$1"
+  local basedir provider d acct
+  for basedir in "$base_edir_gcp" "$base_edir_aws" "$base_edir_azure"; do
+    [ -d "$basedir" ] || continue
+    case "$basedir" in
+      "$base_edir_gcp")   provider="gcp" ;;
+      "$base_edir_aws")   provider="aws" ;;
+      "$base_edir_azure") provider="azure" ;;
+    esac
+    for d in "$basedir"/*/; do
+      [ -d "$d" ] || continue
+      acct=$(basename "$d")
+      if [ -e "$d$cluster_name" ] && ! echo "$cluster_name" | grep -qE "^($ignore_files)$"; then
+        printf "%s %s %s\n" "$provider" "$acct" "$cluster_name"
+      fi
+    done
+  done
+}
+
+# Returns all cluster names across all providers (one per line, may have duplicates)
+_all_cluster_names() {
+  local basedir d
+  for basedir in "$base_edir_gcp" "$base_edir_aws" "$base_edir_azure"; do
+    [ -d "$basedir" ] || continue
+    for d in "$basedir"/*/; do
+      [ -d "$d" ] || continue
+      ls -1 "$d" 2>/dev/null | grep -E -v "^($ignore_files)$"
+    done
+  done
 }
 
 _provider_base() {
@@ -120,6 +159,32 @@ e() {
   local provider="$1"
   local account
   local cluster
+
+  # Single-name cluster shortcut: if one arg that isn't a provider keyword,
+  # search all providers for a matching cluster name.
+  if [ "$#" -eq 1 ]; then
+    case "$provider" in
+      gcp|GCP|google|aws|AWS|azure|AZURE|az) ;;
+      *)
+        local line
+        local -a found=()
+        while IFS= read -r line; do
+          [ -n "$line" ] && found+=("$line")
+        done < <(_find_cluster "$provider")
+        if [ "${#found[@]}" -eq 1 ]; then
+          # shellcheck disable=SC2086
+          e ${found[0]}
+          return
+        elif [ "${#found[@]}" -gt 1 ]; then
+          echo "Ambiguous cluster '$provider' found in multiple accounts:"
+          local m
+          for m in "${found[@]}"; do echo "  e $m"; done
+          return 1
+        fi
+        # Not found as a cluster name; fall through to legacy GCP project mode
+        ;;
+    esac
+  fi
 
   # Backward-compatible default: if first arg is not a known provider, treat as GCP project
   case "$provider" in
@@ -235,7 +300,9 @@ _complete_e() {
 
   case $COMP_CWORD in
     1)
-      COMPREPLY=( $(compgen -W "aws azure gcp $(ls "$base_edir_gcp" 2>/dev/null)" -- "$cur") )
+      local all_clusters
+      all_clusters=$(_all_cluster_names 2>/dev/null | sort -u | tr '\n' ' ')
+      COMPREPLY=( $(compgen -W "aws azure gcp $(ls "$base_edir_gcp" 2>/dev/null) $all_clusters" -- "$cur") )
       ;;
     2)
       case ${COMP_WORDS[1]} in

@@ -2,4 +2,5 @@ keybind = ctrl+option+left=move_tab:-1
 keybind = ctrl+option+right=move_tab:1
 
 copy-on-select = clipboard
-wait-after-command = false
+clipboard-paste-protection = false
+
