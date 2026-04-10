@@ -19,3 +19,9 @@ git clone https://github.com/hubt/dotfiles
 install ag (silver_searcher)
 install aws cli
 install gcloud
+install ollama
+
+install devpods
+install golang
+install vscode
+install watch
